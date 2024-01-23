@@ -13,8 +13,13 @@ export default function Home() {
   const modifiers = [{ name: "red", selected: [], replaceWith: `` }];
 
   //Functions
+  //addSelection handles the text to modify
+  //addChanges handles to change to the selection
+  //replaceText is a smaller scope function that gets called for every modifier
+  //transformText is the main one, handling the whole modifiers array and passing em to replaceText. Also sets state
+
   const addSelection = (target, selection) => {
-    //Finds the modifier from the array and if the selection is not empty pushes it to the "selected" property
+    //Finds the modifier from t he array and if the selection is not empty pushes it to the "selected" property
     let targetObject = modifiers.find((modifier) => modifier.name === target);
     if (selection.length > 0) {
       targetObject.selected.push(selection);
@@ -27,20 +32,22 @@ export default function Home() {
     }
   };
   const replaceText = (text, modifier) => {
+    console.log(modifier);
     //Smaller function that only makes changes on modifier level
-    let modifiedText = modifier.selected.reduce((acc, toReplace, index) => {
-      return acc.replace(toReplace, modifier.replaceWith);
+    let modifiedText = modifier.selected.reduce((accumulator, toReplace) => {
+      return accumulator.replace(toReplace, modifier.replaceWith);
     }, text);
-    console.log(modifiedText);
+    console.log(modifiedText, text);
     return modifiedText;
   };
   const trasformText = (original, changesArray) => {
-    //Applies all changes
+    //Applies all changes and sets state
     let copyText = original;
-    changesArray.forEach((modifier) => {
-      replaceText(copyText, modifier);
-    });
-    return;
+    let newText = changesArray.reduce((accumulator, modifier) => {
+      return replaceText(accumulator, modifier);
+    }, copyText);
+    setOutputText(newText);
+    console.log(newText);
   };
 
   //html
