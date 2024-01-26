@@ -5,29 +5,31 @@ export default function Home() {
   //State related variables
   const [ogText, setOgText] = useState("");
   const [newText, setNewText] = useState("");
-  const [currentModifier, setCurrentModifier] = useState("red");
+  const [modifiers, setModifiers] = useState([
+    { name: "default", regex: /\{(.*?)\}/g },
+  ]);
+  const [currentModifier, setCurrentModifier] = useState("default");
   const [outputText, setOutputText] = useState("");
 
-  //Variables
-  const modifiers = [{ name: "red", regex: /\{(.*?)\}/g}];
-
   //Functions
-  //addChanges handles to change to the selection
+  //addChanges creates a copy of the modifiers array and makes changes to the target object properties. Updates state after.
   //replaceText is a smaller scope function that gets called for every modifier
   //transformText is the main one, handling the whole modifiers array and passing em to replaceText. Also sets state
 
   const addChanges = (target, changes) => {
-    let targetObject = modifiers.find((modifier) => modifier.name === target);
-    if (changes.length > 0) {
-      targetObject.replaceWith = changes;
-    }
+    const newModifiers = [...modifiers];
+    let targetObject = newModifiers.find(
+      (modifier) => modifier.name === target
+    );
+    targetObject.replaceWith = changes;
+    setModifiers(newModifiers);
   };
   const replaceText = (text, modifier) => {
     //Smaller function that only makes changes on modifier level
-    console.log(modifier);
     const { regex, replaceWith } = modifier;
-    if (replaceWith) return text.replaceAll(regex, replaceWith);
-    else return text;
+    if (replaceWith) {
+      return text.replaceAll(regex, replaceWith);
+    } else return text;
   };
   const trasformText = (original, changesArray) => {
     //Applies all changes and sets state
@@ -37,6 +39,13 @@ export default function Home() {
     }, copyText);
     setOutputText(newText);
   };
+
+  //UseEffect
+
+  useEffect(() => {
+    //Handles output
+    trasformText(ogText, modifiers);
+  }, [modifiers]);
 
   //html
   return (
@@ -53,23 +62,15 @@ export default function Home() {
 
       <div className="customizer">
         <h1>Customize</h1>
-        <h2>Content to change</h2>
-        <p>Red</p>
-        <input type="text" onChange={(e) => setNewText(e.target.value)}></input>
-        <button
-          onClick={() => {
-            addChanges(currentModifier, newText);
-          }}
-        >
-          Add changes
-        </button>
-        <button
-          onClick={() => {
-            trasformText(ogText, modifiers);
-          }}
-        >
-          Transform text
-        </button>
+        <div className="modifiers-bar">
+          {modifiers.map((modifier) => (
+            <button key={modifier}>{modifier.name}</button>
+          ))}
+        </div>
+        <input
+          type="text"
+          onChange={(e) => addChanges(currentModifier, e.target.value)}
+        ></input>
       </div>
 
       <div className="output-text">
