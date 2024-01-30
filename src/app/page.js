@@ -71,13 +71,6 @@ export default function Home() {
           value={ogText}
           onChange={(e) => setOgText(e.target.value)}
         />
-        <button
-          onClick={() => {
-            pushModifier("texter", /\/(.*?)\//g);
-          }}
-        >
-          +
-        </button>
       </div>
 
       <div className="modifier-creation">
@@ -85,17 +78,19 @@ export default function Home() {
           onSubmit={(e) => {
             e.preventDefault();
             const name = document.getElementById("name").value;
-            const regexValue = document.getElementById("regex").value;
-            const regexSplit = regexValue.split(" ");
-            const regex = new RegExp(`${regexSplit[0]}(.*?)${regexSplit[1]}`, "g");
+            const regexStart = document.getElementById("regex-s").value;
+            const regexEnd = document.getElementById("regex-e").value;
+            const regexValue = `${regexStart} ${regexEnd}`;
+            const regex = new RegExp(`${regexStart}(.*?)${regexEnd}`, "g");
             pushModifier(name, regex, regexValue);
-            console.log(modifiers);
           }}
         >
           <label htmlFor="name">Name:</label>
           <input type="text" name="name" id="name" required />
-          <label htmlFor="regex">Pattern(separated by space):</label>
-          <input type="text" name="regex" id="regex" required />
+          <label htmlFor="regex">Pattern start:</label>
+          <input type="text" name="regex-s" id="regex-s" required />
+          <label htmlFor="regex">Pattern end:</label>
+          <input type="text" name="regex-e" id="regex-e" required />
           <button>Create</button>
         </form>
       </div>
